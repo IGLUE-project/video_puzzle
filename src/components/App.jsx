@@ -12,7 +12,6 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [screen, setScreen] = useState(VIDEO_SCREEN);
   const prevScreen = useRef(screen);
-  const solution = useRef(null);
   const [appWidth, setAppWidth] = useState(0);
   const [appHeight, setAppHeight] = useState(0);
   
@@ -73,8 +72,10 @@ export default function App() {
     _appSettings.allowSkipVideo = ((_appSettings.allowSkipVideo==="TRUE")||(_appSettings.allowSkipVideo===true));
     _appSettings.showHeader = (_appSettings.allowSkipVideo===true);
 
+    let puzzleSolution = _appSettings.videoURL;
     //Change HTTP protocol to HTTPs in URLs if necessary
     _appSettings = Utils.checkUrlProtocols(_appSettings);
+    _appSettings.puzzleSolution = puzzleSolution;
 
     _appSettings.hasVideo = (typeof _appSettings.videoURL === "string")&&(_appSettings.videoURL.trim()!=="");
     _appSettings.hasPoster = (_appSettings.hasVideo)&&(typeof _appSettings.posterURL === "string")&&(_appSettings.posterURL.trim()!=="");
@@ -175,7 +176,7 @@ export default function App() {
   // }
 
   function submitPuzzleSolution(){
-    let solution = appSettings.videoURL;
+    let solution = appSettings.puzzleSolution;
     if((typeof solution !== "string")||(solution.trim()==="")){
       return;
     }
