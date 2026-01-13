@@ -1,0 +1,13 @@
+div.screen_wrapper {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 2.1s ease, visibility ease 2.1s;
+}
+
+div.screen_wrapper.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
