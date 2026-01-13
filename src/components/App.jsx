@@ -180,8 +180,10 @@ export default function App() {
     if((typeof solution !== "string")||(solution.trim()==="")){
       return;
     }
+    if (escapp.getAllPuzzlesSolved()){
+      return;
+    }
     Utils.log("Submit puzzle solution", solution);
-
     escapp.submitNextPuzzle(solution, {}, (success, erState) => {
       Utils.log("Solution submitted to Escapp", solution, success, erState);
     });
