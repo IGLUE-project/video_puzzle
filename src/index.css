@@ -8,5 +8,5 @@ html, body, div#root, div#global_wrapper, div.screen_wrapper, div.screen_content
 }
 
 html, body {
-  background: transparent;
+  background: black;
 }

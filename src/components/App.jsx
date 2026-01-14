@@ -70,7 +70,6 @@ export default function App() {
     _appSettings.enableControls = ((_appSettings.enableControls==="TRUE")||(_appSettings.enableControls===true));
     _appSettings.showPlayButton = ((_appSettings.enableControls === false)||((_appSettings.showPlayButton==="TRUE")||(_appSettings.showPlayButton===true)));
     _appSettings.allowSkipVideo = ((_appSettings.allowSkipVideo==="TRUE")||(_appSettings.allowSkipVideo===true));
-    _appSettings.showHeader = (_appSettings.allowSkipVideo===true);
 
     let puzzleSolution = _appSettings.videoURL;
     //Change HTTP protocol to HTTPs in URLs if necessary
