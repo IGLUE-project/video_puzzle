@@ -81,6 +81,10 @@ const VideoScreen = (props) => {
       });
     }
 
+    if (appSettings.autoscroll) {
+      scrollToVideo();
+    }
+
     if (appSettings.autoplay) {
       tryAutoplay();
     }
@@ -106,6 +110,30 @@ const VideoScreen = (props) => {
     } catch (error) {
       // Autoplay was blocked
       setHidePlayButton(false);
+    }
+  }
+
+  function scrollToVideo() {
+    const video = videoRef.current;
+    if ((!video)||(appSettings.autoscroll!==true)) return;
+
+    let scrollTarget = video;
+    try {
+      // If running inside a same-origin iframe, scroll to the iframe
+      if (window.self !== window.top && window.frameElement && typeof window.frameElement.scrollIntoView === "function") {
+        scrollTarget = window.frameElement;
+      }
+    } catch (error) {
+      // Cross-origin iframe, parent frame is not accessible, scroll only within the current document.
+    }
+
+    try {
+      scrollTarget.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    } catch (error){
+      // Unable to scroll
     }
   }
 
