@@ -29,7 +29,7 @@ export default function App() {
     setStorage(_escapp.getStorage());
 
     //Get app settings provided by the Escapp server.
-    let _appSettings = processAppSettings(_escapp.getAppSettings());
+    let _appSettings = processAppSettings(_escapp.getAppSettings(), _escapp.getSettings());
     setAppSettings(_appSettings);
     Utils.log("App settings:", _appSettings);
 
@@ -39,7 +39,7 @@ export default function App() {
     }
   }, []);
 
-  function processAppSettings(_appSettings){
+  function processAppSettings(_appSettings, _escappSettings){
     if(typeof _appSettings !== "object"){
       _appSettings = {};
     }
@@ -72,6 +72,10 @@ export default function App() {
     _appSettings.allowSkipVideo = ((_appSettings.allowSkipVideo==="TRUE")||(_appSettings.allowSkipVideo===true));
     _appSettings.autoplay = ((_appSettings.autoplay==="TRUE")||(_appSettings.autoplay===true));
     _appSettings.autoscroll = ((_appSettings.autoscroll==="TRUE")||(_appSettings.autoscroll===true));
+
+    //Disable autoplay and autoscroll in previews
+    _appSettings.autoplay = (_appSettings.autoplay && _escappSettings.preview!==true);
+    _appSettings.autoscroll = (_appSettings.autoscroll && _escappSettings.preview!==true);
 
     let puzzleSolution = _appSettings.videoURL;
     //Change HTTP protocol to HTTPs in URLs if necessary

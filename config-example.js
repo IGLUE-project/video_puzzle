@@ -19,5 +19,6 @@ export let ESCAPP_APP_SETTINGS = {
     endpoint: "https://escapp.es/api/escapeRooms/id",
     linkedPuzzleIds: [1],
     rtc: false,
+    preview: false,
   },
 };
