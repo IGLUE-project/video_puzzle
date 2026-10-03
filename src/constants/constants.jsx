@@ -4,6 +4,8 @@ export const DEFAULT_APP_SETTINGS = {
   enableControls: "TRUE",
   showPlayButton: "FALSE",
   allowSkipVideo: "TRUE",
+  autoplay: "FALSE",
+  autoScroll: "FALSE",
 };
 
 export const THEMES = {

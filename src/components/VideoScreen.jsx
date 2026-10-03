@@ -1,19 +1,30 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { GlobalContext } from "./GlobalContext";
 import './../assets/scss/video_screen.scss';
+const CHECK_SKIP_BUTTON_EVENTS = ["mousemove", "touchstart", "touchmove", "click", "keydown"];
 
 const VideoScreen = (props) => {
   const { escapp, appSettings, Utils, I18n } = useContext(GlobalContext);
-  const [hidePlayButton, setHidePlayButton] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+  const [hidePlayButton, setHidePlayButton] = useState(appSettings.autoplay);
   const [hideSkipButton, setHideSkipButton] = useState(false);
   const solutionSentRef = useRef(false);
   const videoRef = useRef(null);
   const videoInitCalledRef = useRef(false);
+  const autoplayTimerRef = useRef(null);
   const showSkipButtonTimerRef = useRef(null);
-  
+
+  useEffect(() => {
+    const delay = 0; //This can be changed for testing autoplay
+    const timer = setTimeout(() => {
+      setShowVideo(appSettings.hasVideo);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !showVideo) return;
 
     function onLoadedMetadata(ev) {
       if (videoInitCalledRef.current === true) return;
@@ -29,10 +40,19 @@ const VideoScreen = (props) => {
 
     return () => {
       video.removeEventListener("loadedmetadata", onLoadedMetadata);
+      CHECK_SKIP_BUTTON_EVENTS.forEach(eventName => {
+        video.removeEventListener(eventName, checkShowSkipButton);
+      });
+      videoInitCalledRef.current = false;
+    };
+  }, [showVideo]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(showSkipButtonTimerRef.current);
+      clearTimeout(autoplayTimerRef.current);
     };
   }, []);
-
-  useEffect(() => () => clearTimeout(showSkipButtonTimerRef.current), []);
 
   useEffect(() => {
     handleResize();
@@ -51,15 +71,42 @@ const VideoScreen = (props) => {
 
   function videoInit(ev) {
     const video = ev.target;
-    if(video === null) return;
-
-    if(appSettings.allowSkipVideo === true){
-      ["mousemove", "touchstart", "touchmove", "click", "keydown"].forEach(ev =>
-        video.addEventListener(ev, checkShowSkipButton, { passive: true })
-      );
-    }
+    if (!video) return;
 
     resizeVideo();
+
+    if (appSettings.allowSkipVideo === true) {
+      CHECK_SKIP_BUTTON_EVENTS.forEach(eventName => {
+        video.addEventListener(eventName, checkShowSkipButton, { passive: true });
+      });
+    }
+
+    if (appSettings.autoplay) {
+      tryAutoplay();
+    }
+  }
+
+  async function tryAutoplay() {
+    const video = videoRef.current;
+    if ((!video)||(appSettings.autoplay!==true)) return;
+
+    try {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        await playPromise;
+      } else {
+        //Fallback
+        autoplayTimerRef.current = setTimeout(() => {
+          const videoPlaying = (!video.paused && !video.ended);
+          if (!videoPlaying) {
+            setHidePlayButton(false);
+          }
+        }, 1000);
+      }
+    } catch (error) {
+      // Autoplay was blocked
+      setHidePlayButton(false);
+    }
   }
 
   function checkShowSkipButton() {
@@ -91,10 +138,14 @@ const VideoScreen = (props) => {
     sendSolution();
   }
 
-  function onClickPlayVideo(){
+  function onClickPlayVideo() {
     const video = videoRef.current;
-    if(video !== null){
-      video.play();
+    if (!video) return;
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        Utils.log("Unable to play video:", error);
+      });
     }
   }
 
@@ -117,7 +168,7 @@ const VideoScreen = (props) => {
     }
   }
 
-  const showVideo = appSettings.hasVideo;
+  // const showVideo = appSettings.hasVideo; //showVideo is changed through useEffect
   const showControls = appSettings.enableControls;
   const showPlayButton = appSettings.showPlayButton && hidePlayButton===false;
   const showSkipButton = appSettings.allowSkipVideo && hideSkipButton === false;

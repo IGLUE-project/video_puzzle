@@ -9,6 +9,8 @@ export let ESCAPP_APP_SETTINGS = {
   showPlayButton: "FALSE", //Specify whether a play button will be displayed
   allowSkipVideo: "TRUE", //Specify whether the player can progress in the escape room without watching the video
   //skipVideoText: "Skip this video »", //Specify a custom text for the skip video button
+  // autoplay: "TRUE", //Specify whether the video will play automatically
+  // autoscroll: "TRUE", //Specify whether the page will automatically scroll to the video if possible
 
   //Settings that will be automatically specified by the Escapp server
   locale: "es",
